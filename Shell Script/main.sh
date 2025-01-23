@@ -1,22 +1,20 @@
 #!/bin/bash
 
 # Author: Azeemuddin Shaik
-# Description: This script uploads Jenkins build logs created today to an S3 bucket, with snapshot optimizations.
-# It checks if AWS CLI is installed, compresses logs, uploads them to S3, deletes them from EC2, and manages EC2 snapshots to optimize AWS costs.
+# Description: Uploads Jenkins build logs created today to an S3 bucket, compresses them, deletes from EC2, 
+# and optionally manages EC2 snapshots for cost optimization.
 
-# Load environment variables from .env file if it exists
+# Load environment variables from .env file
 if [ -f .env ]; then
     export $(grep -v '^#' .env | xargs)
+else
+    echo ".env file not found. Please create a .env file with required configurations."
+    exit 1
 fi
 
 # Variables
-JENKINS_HOME="${JENKINS_HOME:-/var/lib/jenkins}"  # Default to /var/lib/jenkins if not set in .env
-S3_BUCKET="${S3_BUCKET:-s3://your-s3-bucket-name}"  # Default to your S3 bucket if not set in .env
 DATE=$(date +%Y-%m-%d)  # Today's date
 LOG_FILE="/var/log/upload_jenkins_build_logs.log"  # Log file path
-DRY_RUN="${DRY_RUN:-false}"  # Default to false if not set in .env
-COMPRESSION="${COMPRESSION:-true}"  # Enable compression by default
-SNAPSHOT_ENABLED="${SNAPSHOT_ENABLED:-false}"  # Option to enable EC2 snapshots (default is false)
 
 # Function to log messages
 log_message() {

@@ -1,27 +1,42 @@
-# Stage 1: Build the React app
-FROM node:alpine AS build
+# Stage 1: Build React app
+FROM node:18-alpine AS builder
 
+# Set the working directory
 WORKDIR /app
 
-COPY package.json package-lock.json ./
+# Copy package.json and package-lock.json
+COPY package*.json ./
 
-RUN npm install
+# Install dependencies
+RUN npm ci --production
 
+# Copy the rest of the application code
 COPY . .
 
+# Build the React app
 RUN npm run build
 
-# Stage 2: Serve the React app with Distroless Nginx
-FROM gcr.io/distroless/nginx:latest
+# Stage 2: Serve React app using NGINX
+FROM nginx:1.25-alpine
 
-# Copy the build output to Nginx's html directory
-COPY --from=build /app/build /usr/share/nginx/html
+# Remove the default NGINX configuration file
+RUN rm /etc/nginx/conf.d/default.conf
 
-# Copy custom Nginx configuration file
-COPY nginx.conf /etc/nginx/nginx.conf
+# Copy the built React app from the builder stage
+COPY --from=builder /app/build /usr/share/nginx/html
 
-# Expose port 80
+# Copy custom NGINX configuration file
+COPY ./nginx.conf /etc/nginx/conf.d/default.conf
+
+# Create a new user and group to run NGINX
+RUN addgroup -S nginx && adduser -S -G nginx nginx
+
+# Switch to the new user
+USER nginx
+
+# Expose ports 80 and 443
 EXPOSE 80
+EXPOSE 443
 
-# Start Nginx server
+# Start NGINX
 CMD ["nginx", "-g", "daemon off;"]

@@ -5,7 +5,8 @@
 #  Project Title:  Integrating cAdvisor for Docker Container Monitoring with Prometheus, Grafana, and Alerting System
 
 #  End Goal:  
-# To implement a comprehensive Docker container monitoring solution, leveraging cAdvisor, Prometheus, and Grafana for real-time performance monitoring and alerting, with a focus on improving operational visibility and incident response time.
+# To implement a comprehensive Docker container monitoring solution, leveraging cAdvisor, 
+# Prometheus, and Grafana for real-time performance monitoring and alerting, with a focus on improving operational visibility and incident response time.
 
 #  Technologies Used: 
 # -  Prometheus  for metrics collection and monitoring.

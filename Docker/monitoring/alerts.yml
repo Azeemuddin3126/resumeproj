@@ -1,0 +1,40 @@
+groups:
+  - name: host-alerts
+    rules:
+      - alert: HighCPUUsage
+        expr: rate(node_cpu_seconds_total{mode="system"}[2m]) > 0.7
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage on host"
+          description: "CPU usage on {{ $labels.instance }} is above 70%."
+
+      - alert: LowDiskSpace
+        expr: node_filesystem_avail_bytes / node_filesystem_size_bytes < 0.2
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Low disk space on host"
+          description: "Available disk space on {{ $labels.instance }} is below 20%."
+
+  - name: container-alerts
+    rules:
+      - alert: ContainerHighMemoryUsage
+        expr: container_memory_working_set_bytes / container_spec_memory_limit_bytes > 0.8
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage in container"
+          description: "Container {{ $labels.container_label_com_docker_compose_service }} is using more than 80% of its allocated memory."
+
+      - alert: ContainerHighCPUUsage
+        expr: rate(container_cpu_usage_seconds_total[2m]) > 0.7
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage in container"
+          description: "Container {{ $labels.container_label_com_docker_compose_service }} is using more than 70% CPU."

@@ -1,0 +1,32 @@
+global:
+  smtp_smarthost: 'smtp.gmail.com:587'
+  smtp_from: 'your-email@gmail.com'
+  smtp_auth_username: 'your-email@gmail.com'
+  smtp_auth_password: '${SMTP_PASSWORD}'
+
+route:
+  group_by: ['alertname']
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 1h
+  receiver: 'email-alert'
+
+  routes:
+    - match:
+        severity: critical
+      receiver: 'email-alert'
+
+    - match:
+        severity: warning
+      receiver: 'slack-alert'
+
+receivers:
+  - name: 'email-alert'
+    email_configs:
+      - to: 'recipient-email@gmail.com'
+
+  - name: 'slack-alert'
+    slack_configs:
+      - api_url: 'https://hooks.slack.com/services/TXXXXXX/BXXXXXX/XXXXXXXXXX'
+        channel: '#alerts'
+        text: '{{ .CommonAnnotations.description }}'

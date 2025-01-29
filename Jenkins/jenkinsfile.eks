@@ -1,0 +1,65 @@
+pipeline {
+    agent any
+    
+    environment {
+        // Define environment variables for AWS credentials, ECR repository, EKS cluster, etc.
+        AWS_ACCESS_KEY_ID = credentials('aws-access-key-id')
+        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
+        AWS_REGION = 'your-aws-region'
+        ECR_REPO = 'your-ecr-repository'
+        EKS_CLUSTER = 'your-eks-cluster'
+    }
+    
+    stages {
+        stage('Build and Test') {
+            steps {
+                // Checkout source code from version control
+                git 'https://github.com/your/repository.git'
+                
+                // Build and test using Maven
+                sh 'mvn clean package'
+            }
+        }
+        
+        stage('Build Docker Image') {
+            steps {
+                // Build Docker image
+                script {
+                    docker.build("${ECR_REPO}:${env.BUILD_NUMBER}")
+                }
+            }
+        }
+        
+        stage('Push to ECR') {
+            steps {
+                // Authenticate with ECR
+                withCredentials([string(credentialsId: 'ecr-credentials', variable: 'DOCKER_CREDENTIALS')]) {
+                    sh "echo $DOCKER_CREDENTIALS | docker login -u AWS --password-stdin https://${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+                }
+                
+                // Tag and push Docker image to ECR
+                script {
+                    docker.withRegistry("https://${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com", 'ecr-credentials') {
+                        docker.image("${ECR_REPO}:${env.BUILD_NUMBER}").push()
+                    }
+                }
+            }
+        }
+        
+        stage('Deploy to EKS') {
+            steps {
+                // Deploy image to EKS
+                sh "kubectl apply -f kubernetes/deployment.yaml --kubeconfig=kubeconfig.yaml"
+            }
+        }
+        
+        stage('Monitor Logs') {
+            steps {
+                // Monitoring setup using Prometheus and Grafana
+                // Example: Configuration and deployment of Prometheus and Grafana resources
+                sh "kubectl apply -f kubernetes/prometheus.yaml --kubeconfig=kubeconfig.yaml"
+                sh "kubectl apply -f kubernetes/grafana.yaml --kubeconfig=kubeconfig.yaml"
+            }
+        }
+    }
+}

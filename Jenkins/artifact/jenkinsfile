@@ -105,14 +105,25 @@ pipeline {
             }
         }
 
-        stage('Build Python Artifact (Wheel)') {
+        stage('Build Python Wheel for Dependencies') {
             steps {
-                echo "Building Python wheel artifact..."
-                sh """
-                    python3 setup.py sdist bdist_wheel
-                """
+            echo "Building Python wheel for dependencies using Docker Python 3 image..."
+            sh """
+                # Install dependencies and build wheels for them
+                docker run --rm \
+                -v \$(pwd):/workspace \
+                -w /workspace \
+                python:3.9-alpine \
+                sh -c "
+                    pip install --upgrade pip && \
+                    pip install -r requirements.txt && \
+                    mkdir -p dist && \
+                    pip wheel -r requirements.txt --no-deps --wheel-dir dist/
+                "
+            """
             }
         }
+
 
         stage('Upload Python Artifact to Nexus') {
             steps {

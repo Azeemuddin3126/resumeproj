@@ -1,0 +1,80 @@
+pipeline {
+    agent any
+
+    environment {
+        NODE_IMAGE = 'node:16-alpine' // Use an official Node.js image for building the app
+    }
+
+    stages {
+
+        stage('Clean Workspace') {
+            steps {
+                echo 'Cleaning workspace...'
+                cleanWs()
+            }
+        }
+
+        stage('Git Checkout') {
+            steps {
+                echo "Cloning the repository..."
+                git branch: 'main', url: 'https://github.com/yourusername/your-mern-project.git'
+            }
+        }
+
+        stage('Install Backend Dependencies') {
+            steps {
+                echo 'Installing backend dependencies...'
+                sh """
+                    docker run --rm \
+                        -v \$(pwd):/workspace \
+                        -w /workspace/backend \
+                        ${NODE_IMAGE} \
+                        sh -c "npm install"
+                """
+            }
+        }
+
+        stage('Build Frontend (React)') {
+            steps {
+                echo 'Building the frontend (React)...'
+                sh """
+                    docker run --rm \
+                        -v \$(pwd):/workspace \
+                        -w /workspace/frontend \
+                        ${NODE_IMAGE} \
+                        sh -c "npm install && npm run build"
+                """
+            }
+        }
+
+        stage('Package Backend') {
+            steps {
+                echo 'Packaging the backend...'
+                sh """
+                    docker run --rm \
+                        -v \$(pwd):/workspace \
+                        -w /workspace/backend \
+                        ${NODE_IMAGE} \
+                        sh -c "npm pack"
+                """
+            }
+        }
+
+        stage('Dockerize Application') {
+            steps {
+                echo 'Building Docker image for the MERN app...'
+                script {
+                    def dockerImageTag = "mern-app:${BUILD_NUMBER}"
+                    docker.build(dockerImageTag)
+                    docker.withRegistry('', 'dockerhub') {
+                        // Push the image to Docker Hub or any registry
+                        dockerImage.push()
+                        dockerImage.push('latest')
+                    }
+                    env.DOCKER_IMAGE_NAME = dockerImageTag
+                }
+            }
+        }
+
+    }
+}

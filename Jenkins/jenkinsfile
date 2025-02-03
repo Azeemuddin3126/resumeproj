@@ -1,0 +1,162 @@
+pipeline {
+    agent any
+
+    environment {
+        GITHUB_REPO = 'https://github.com/Azeemuddin3126/salmaanportfolio31.git'
+        BRANCH = 'main'
+        IMAGE = 'python:3.9-alpine'  // Python base image for Docker
+        DOCKER_IMAGE_BASE = 'salmaan21/django-sample-web'
+        SONARQUBE_SCANNER_HOME = tool 'sonarscan'
+        SONARQUBE_URL = 'http://localhost:9000'
+        SLACK_CHANNEL = '#devopsworkupdates'
+        
+        NEXUS_URL = 'http://nexus.example.com'
+        NEXUS_REPO = 'docker-repository' // The Docker repository name in Nexus
+        PYTHON_REPO = 'python-repository' // The Python repository name in Nexus
+        NEXUS_USERNAME = 'your-nexus-username'
+        NEXUS_PASSWORD = 'your-nexus-password'
+    }
+
+    stages {
+        stage('Clean Workspace') {
+            steps {
+                echo 'Cleaning workspace...'
+                cleanWs()
+            }
+        }
+
+        stage('Git Checkout') {
+            steps {
+                echo "Cloning the repository..."
+                git branch: "${BRANCH}", url: "${GITHUB_REPO}"
+            }
+        }
+
+        stage('Static Code Analysis (Flake8)') {
+            steps {
+                echo "Running static code analysis with Flake8..."
+                sh """
+                    docker run --rm -v \$(pwd):/apps alpine/flake8 /apps > flake8-report.txt || echo "Done testing, please check the file"
+                """
+            }
+        }
+
+        stage('OWASP Dependency-Check') {
+            steps {
+                echo "Running OWASP Dependency-Check..."
+                sh """
+                    docker run --rm -v \$(pwd):/mnt/reports --entrypoint "" owasp/dependency-check --scan /mnt/reports --format HTML --out /mnt/reports
+                """
+            }
+        }
+
+        stage('TRIVY FS SCAN') {
+            steps {
+                echo "Running Trivy FS Scan..."
+                sh "docker run --rm aquasec/trivy fs . > trivy-fs-report.txt"
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                echo 'Running SonarQube Analysis...'
+                withSonarQubeEnv('sonarqube') {
+                    sh "sonar-scanner -Dsonar.sources=. -Dsonar.projectName=SampleApp -Dsonar.projectKey=SampleApp"
+                }
+            }
+        }
+
+        stage('Wait for Quality Gate') {
+            steps {
+                script {
+                    echo 'Waiting for SonarQube Quality Gate to pass...'
+                    def qualityGate = waitForQualityGate(timeout: 1) // Timeout of 1 minute
+                    if (qualityGate.status != 'OK') {
+                        error "Quality Gate failed! Please check SonarQube for details."
+                    }
+                }
+            }
+        }
+
+        stage('Docker Build & Push') {
+            steps {
+                script {
+                    def dockerImageTag = "${DOCKER_IMAGE_BASE}:${BUILD_NUMBER}"
+                    docker.withRegistry('', 'docker') {
+                        def image = docker.build(dockerImageTag)
+                        image.push()
+                        image.push('latest')
+                    }
+                    env.DOCKER_IMAGE_NAME = dockerImageTag
+                }
+            }
+        }
+
+        stage('Upload Docker Image to Nexus') {
+            steps {
+                script {
+                    echo "Pushing Docker image to Nexus repository..."
+                    docker.withRegistry("http://${NEXUS_URL}", "docker") {
+                        def image = docker.image("${DOCKER_IMAGE_NAME}")
+                        image.push("${BUILD_NUMBER}")
+                        image.push("latest")
+                    }
+                }
+            }
+        }
+
+        stage('Build Python Artifact (Wheel)') {
+            steps {
+                echo "Building Python wheel artifact..."
+                sh """
+                    python3 setup.py sdist bdist_wheel
+                """
+            }
+        }
+
+        stage('Upload Python Artifact to Nexus') {
+            steps {
+                script {
+                    def artifactFile = 'dist/my-package.whl'  // Adjust this to your actual artifact path
+                    echo "Uploading Python artifact to Nexus..."
+                    sh """
+                        curl -u ${NEXUS_USERNAME}:${NEXUS_PASSWORD} \
+                        --upload-file ${artifactFile} \
+                        ${NEXUS_URL}/repository/${PYTHON_REPO}/my-package-${BUILD_NUMBER}.whl
+                    """
+                }
+            }
+        }
+
+        stage('Trivy Image Scan') {
+            steps {
+                echo 'Running Trivy Image Scan...'
+                sh """
+                    docker run --rm aquasec/trivy image ${DOCKER_IMAGE_NAME} --scanners vuln > trivy-image-report.txt
+                """
+            }
+        }
+
+        stage('Clean up the system') {
+            steps {
+                echo 'Cleaning up the docker system...'
+                sh """
+                    docker system prune -a --force
+                """
+                echo 'Done pruning...'
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'This will always run regardless of success or failure.'
+        }
+        success {
+            echo 'Build completed successfully!'
+        }
+        failure {
+            echo 'Build failed. Check the logs for more details.'
+        }
+    }
+}

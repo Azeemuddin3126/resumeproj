@@ -1,0 +1,77 @@
+pipeline {
+    agent any
+
+    environment {
+        FLASK_IMAGE = 'python:3.9-alpine'  // Use a Python base image
+        FLASK_APP_DIR = '/workspace'
+    }
+
+    stages {
+
+        stage('Clean Workspace') {
+            steps {
+                echo 'Cleaning workspace...'
+                cleanWs()
+            }
+        }
+
+        stage('Git Checkout') {
+            steps {
+                echo "Cloning the repository..."
+                git branch: 'main', url: 'https://github.com/yourusername/your-flask-project.git'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                echo 'Installing Flask dependencies...'
+                sh """
+                    docker run --rm \
+                        -v \$(pwd):${FLASK_APP_DIR} \
+                        -w ${FLASK_APP_DIR} \
+                        ${FLASK_IMAGE} \
+                        sh -c "pip install -r requirements.txt"
+                """
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                echo 'Running tests with pytest...'
+                sh """
+                    docker run --rm \
+                        -v \$(pwd):${FLASK_APP_DIR} \
+                        -w ${FLASK_APP_DIR} \
+                        ${FLASK_IMAGE} \
+                        sh -c "pytest"
+                """
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                echo 'Building Docker image for the Flask application...'
+                script {
+                    def dockerImageTag = "flask-app:${BUILD_NUMBER}"
+                    docker.build(dockerImageTag)
+                    docker.withRegistry('', 'dockerhub') {
+                        // Push the image to Docker Hub or any registry
+                        dockerImage.push()
+                        dockerImage.push('latest')
+                    }
+                    env.DOCKER_IMAGE_NAME = dockerImageTag
+                }
+            }
+        }
+
+        stage('Deploy to Docker (Optional)') {
+            steps {
+                echo 'Deploying Flask app using Docker...'
+                sh """
+                    docker run -d -p 5000:5000 ${env.DOCKER_IMAGE_NAME}
+                """
+            }
+        }
+
+    }
+}

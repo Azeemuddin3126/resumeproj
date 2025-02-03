@@ -171,3 +171,18 @@ pipeline {
         }
     }
 }
+
+
+
+
+// stage('Package Flask App with Virtual Environment') {
+//     steps {
+//         echo 'Packaging Flask app with virtual environment...'
+//         sh """
+//             python3 -m venv venv  # Create a virtual environment
+//             source venv/bin/activate  # Activate the virtual environment
+//             pip install -r requirements.txt  # Install dependencies in the virtual environment
+//             tar -czvf flask-app-with-venv-${BUILD_NUMBER}.tar.gz .  # Package the app with the virtual environment
+//         """
+//     }
+// }

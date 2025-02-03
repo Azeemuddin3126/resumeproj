@@ -1,0 +1,30 @@
+version: '3.7'
+
+networks:
+  monitoring:
+    driver: bridge
+
+volumes:
+  prometheus-data:  # Persistent volume for Prometheus
+  grafana-data:     # Persistent volume for Grafana
+  alertmanager-data: # Persistent volume for Alertmanager
+
+services:
+  monitoring:
+    image: salmaan21/observability
+    container_name: monitoring
+    restart: unless-stopped
+    ports:
+      - "9090:9090"   # Prometheus
+      - "3000:3000"   # Grafana
+      - "9323:9323"   # cAdvisor
+      - "9100:9100"   # Node Exporter
+      - "9093:9093"   # Alertmanager
+    volumes:
+      - prometheus-data:/prometheus
+      - grafana-data:/var/lib/grafana
+      - alertmanager-data:/alertmanager
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    networks:
+      - monitoring

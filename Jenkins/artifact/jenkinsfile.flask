@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        FLASK_IMAGE = 'python:3.9-alpine'  // Use a Python base image
-        FLASK_APP_DIR = '/workspace'
+        DJANGO_IMAGE = 'python:3.10-alpine'  // Use Python 3.9 Alpine Docker image
+        DJANGO_APP_DIR = '/workspace'
     }
 
     stages {
@@ -18,58 +18,31 @@ pipeline {
         stage('Git Checkout') {
             steps {
                 echo "Cloning the repository..."
-                git branch: 'main', url: 'https://github.com/yourusername/your-flask-project.git'
+                git branch: 'main', url: 'https://github.com/Azeemuddin3126/salmaanportfolio31.git'
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Install Dependencies and Package Virtual Environment') {
             steps {
-                echo 'Installing Flask dependencies...'
+                echo 'Creating virtual environment, installing dependencies, and packaging the Django app with venv...'
                 sh """
                     docker run --rm \
-                        -v \$(pwd):${FLASK_APP_DIR} \
-                        -w ${FLASK_APP_DIR} \
-                        ${FLASK_IMAGE} \
-                        sh -c "pip install -r requirements.txt"
+                        -v \$(pwd):${DJANGO_APP_DIR} \
+                        -w ${DJANGO_APP_DIR} \
+                        ${DJANGO_IMAGE} \
+                        sh -c "
+                            python3 -m venv venv && \
+                            source venv/bin/activate && \
+                            pip install -r requirements.txt && \
+                            tar -czvf django-app-with-venv-${BUILD_NUMBER}.tar.gz ."
                 """
             }
         }
 
-        stage('Run Tests') {
+        stage('Archive Artifacts') {
             steps {
-                echo 'Running tests with pytest...'
-                sh """
-                    docker run --rm \
-                        -v \$(pwd):${FLASK_APP_DIR} \
-                        -w ${FLASK_APP_DIR} \
-                        ${FLASK_IMAGE} \
-                        sh -c "pytest"
-                """
-            }
-        }
-
-        stage('Build Docker Image') {
-            steps {
-                echo 'Building Docker image for the Flask application...'
-                script {
-                    def dockerImageTag = "flask-app:${BUILD_NUMBER}"
-                    docker.build(dockerImageTag)
-                    docker.withRegistry('', 'dockerhub') {
-                        // Push the image to Docker Hub or any registry
-                        dockerImage.push()
-                        dockerImage.push('latest')
-                    }
-                    env.DOCKER_IMAGE_NAME = dockerImageTag
-                }
-            }
-        }
-
-        stage('Deploy to Docker (Optional)') {
-            steps {
-                echo 'Deploying Flask app using Docker...'
-                sh """
-                    docker run -d -p 5000:5000 ${env.DOCKER_IMAGE_NAME}
-                """
+                echo 'Archiving the packaged artifact with virtual environment...'
+                archiveArtifacts artifacts: 'django-app-with-venv-${BUILD_NUMBER}.tar.gz', allowEmptyArchive: true
             }
         }
 

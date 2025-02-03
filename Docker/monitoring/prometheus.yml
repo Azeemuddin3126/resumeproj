@@ -1,3 +1,7 @@
+# helm repo add bitnami https://charts.bitnami.com/bitnami
+# helm install my-release bitnami/kube-prometheus
+
+
 global:
   scrape_interval: 15s
 

@@ -1,3 +1,5 @@
+// dckr_pat_MB5nBsvW9GPg5q3v5yug3oxxmZE
+// squ_4e5a45eb7de61351d16869204a4e978001904851
 pipeline {
     agent any
 

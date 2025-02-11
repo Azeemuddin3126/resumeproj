@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent any // { label 'dev' }  // This will run on the configured agent server
 
     environment {
         DJANGO_IMAGE = 'python:3.10-alpine'  // Use Python 3.9 Alpine Docker image
@@ -34,7 +34,8 @@ pipeline {
                             python3 -m venv venv && \
                             source venv/bin/activate && \
                             pip install -r requirements.txt && \
-                            tar -czvf django-app-with-venv-${BUILD_NUMBER}.tar.gz ."
+                            tar -czvf django-app-with-venv-${BUILD_NUMBER}.tar.gz . && \
+                            ls -l django-app-with-venv-${BUILD_NUMBER}.tar.gz"
                 """
             }
         }

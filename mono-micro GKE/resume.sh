@@ -1,26 +1,25 @@
-# Migrating a Monolithic Website to Microservices on Google Kubernetes Engine
+### **Project Title:** Migrating a Monolithic Website to Microservices on Google Kubernetes Engine
 
-# This project involves migrating a monolithic application to a microservices
-# architecture using Google Kubernetes Engine (GKE) to improve scalability,
-# resilience, and deployment efficiency.
+# End Goal:
+# Successfully migrated a monolithic application to a microservices architecture using Google Kubernetes Engine (GKE)
+# to enhance scalability, resilience, and deployment efficiency while reducing downtime and improving system performance.
 
-# Key Achievements:
-# - Deployed a 3-node GKE cluster and containerized the monolithic application
-#   using Docker.
-# - Broke down the monolith into three microservices (Orders, Products, Frontend)
-#   using Spring Boot & Spring Cloud.
-# - Automated CI/CD pipeline with Google Cloud Build, reducing deployment time
-#   by 30%.
-# - Implemented Kubernetes Deployments & Services, improving fault tolerance and
-#   scalability.
-# - Exposed microservices via Load Balancers, ensuring external accessibility with
-#   minimal downtime.
-# - Optimized API communication by configuring Ingress & Service Mesh, reducing
-#   response time by 40%.
+### **Key Achievements:**
+# - Deployed a highly available GKE cluster: Provisioned a 3-node Kubernetes cluster and containerized the monolithic application using Docker.
+# - Refactored monolith into microservices: Split the application into Orders, Products, and Frontend microservices using Spring Boot & Spring Cloud, ensuring modularity and scalability.
+# - Automated CI/CD pipeline: Implemented Google Cloud Build and Artifact Registry, reducing deployment time by 30% through automated builds and rollouts.
+# - Improved fault tolerance and scaling: Configured Kubernetes Deployments & Services, enabling zero-downtime updates and automatic recovery.
+# - Optimized service discovery & API communication: Integrated Kubernetes Ingress & Service Mesh, reducing API response time by 40%.
+# - Ensured external accessibility: Deployed Cloud Load Balancers, providing a seamless experience with minimal downtime.
+# - Modernized frontend services: Developed and deployed a React.js & Node.js-based frontend for improved performance and scalability.
 
-# Technologies Used:
-# - Kubernetes (GKE), Docker, Spring Boot, Spring Cloud
-# - Google Cloud Platform (GCP), Cloud Build, Artifact Registry
-# - React.js, Node.js (for frontend services)
-# - CI/CD Pipelines, Kubernetes Ingress, Load Balancer
-# - gcloud CLI, kubectl, REST APIs
+### **Technologies Used:**
+# - Containerization & Orchestration: Kubernetes (GKE), Docker
+# - Backend: Spring Boot, Spring Cloud, REST APIs
+# - Frontend: React.js, Node.js
+# - Cloud & DevOps: Google Cloud Platform (GCP), Cloud Build, Artifact Registry
+# - Networking & Load Balancing: Kubernetes Ingress, Cloud Load Balancer, Service Mesh
+# - CI/CD & Automation: Cloud Build, gcloud CLI, kubectl
+
+# This version keeps it structured, quantified, and ATS-friendly while emphasizing impact and modernization.
+# Let me know if you need any refinements! 🚀

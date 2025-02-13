@@ -38,3 +38,6 @@
 # CI/CD: GitHub Actions, Cloud Build, Artifact Registry
 # Monitoring & Logging: Prometheus, Micrometer, Cloud Trace, Stackdriver
 # Security: OAuth2, IAM Roles, TLS Certificates
+
+
+# okay Security oauth IAM roles TlS certficates

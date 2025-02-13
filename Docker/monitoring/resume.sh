@@ -21,13 +21,13 @@
 # -  Docker Compose  for managing multi-container Docker applications.
 
 #  Key Achievements: 
-# - Configured  Prometheus  to scrape both Docker container metrics (via  cAdvisor ) and host-level metrics (via  Node Exporter ), monitoring CPU, memory, disk, and network usage.
-# - Developed and deployed  Grafana  dashboards for visualizing container and host metrics, providing real-time insights and improving visibility by 60% for system administrators.
-# - Created automated  alert rules  to track critical resource usage metrics (e.g., CPU > 70%, disk space < 20%) and trigger notifications via  Slack  and  email .
-# - Integrated  Alertmanager  to streamline alert notification routing, enhancing incident response time by 50%.
-# - Set up  persistent storage  for Prometheus and Grafana to ensure data durability, even during container restarts.
-# - Implemented  network isolation  for Docker containers, ensuring secure communication between services.
-# - Deployed the monitoring stack using  Docker Compose , enabling easy scaling and management of the multi-container monitoring infrastructure.
+Configured  Prometheus  to scrape both Docker container metrics (via  cAdvisor ) and host-level metrics (via  Node Exporter ), monitoring CPU, memory, disk, and network usage.
+Developed and deployed  Grafana  dashboards for visualizing container and host metrics, providing real-time insights and improving visibility by 60% for system administrators.
+Created automated  alert rules  to track critical resource usage metrics (e.g., CPU > 70%, disk space < 20%) and trigger notifications via  Slack  and  email .
+Integrated  Alertmanager  to streamline alert notification routing, enhancing incident response time by 50%.
+Set up  persistent storage  for Prometheus and Grafana to ensure data durability, even during container restarts.
+Implemented  network isolation  for Docker containers, ensuring secure communication between services.
+Deployed the monitoring stack using  Docker Compose , enabling easy scaling and management of the multi-container monitoring infrastructure.
 
 # ---
 

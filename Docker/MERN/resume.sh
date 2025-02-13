@@ -22,20 +22,20 @@
 
 ### **Key Achievements:**  
 
-# - Optimized Multi-Stage Builds: Reduced Docker image sizes by 40% using multi-stage builds 
-#   with Alpine and Distroless images.
-# - Secure HTTPS Integration: Configured NGINX with SSL/TLS encryption and security headers 
-#   to meet production-grade security standards.
-# - Scalable Database Configuration: Deployed MongoDB with lightweight Bitnami images and 
-#   persistent volume support for scalability and reliability.
-# - Improved Build Efficiency: Excluded unnecessary files using `.dockerignore`, decreasing 
-#   Docker context size by 35%.
-# - Enhanced Frontend Performance: Implemented NGINX caching and gzip compression, improving 
-#   asset load time by up to 20%.
-# - Environment Management: Centralized sensitive configurations in `.env` files, improving 
-#   maintainability and security.
-# - Network Isolation: Created a custom Docker bridge network to isolate and secure container 
-#   communication.
+Optimized Multi-Stage Builds: Reduced Docker image sizes by 40% using multi-stage builds 
+with Alpine and Distroless images.
+Secure HTTPS Integration: Configured NGINX with SSL/TLS encryption and security headers 
+to meet production-grade security standards.
+Scalable Database Configuration: Deployed MongoDB with lightweight Bitnami images and 
+persistent volume support for scalability and reliability.
+Improved Build Efficiency: Excluded unnecessary files using `.dockerignore`, decreasing 
+Docker context size by 35%.
+Enhanced Frontend Performance: Implemented NGINX caching and gzip compression, improving 
+asset load time by up to 20%.
+Environment Management: Centralized sensitive configurations in `.env` files, improving 
+maintainability and security.
+Network Isolation: Created a custom Docker bridge network to isolate and secure container 
+communication.
 
 ---
 

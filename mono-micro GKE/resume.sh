@@ -5,13 +5,13 @@
 # to enhance scalability, resilience, and deployment efficiency while reducing downtime and improving system performance.
 
 ### **Key Achievements:**
-# - Deployed a highly available GKE cluster: Provisioned a 3-node Kubernetes cluster and containerized the monolithic application using Docker.
-# - Refactored monolith into microservices: Split the application into Orders, Products, and Frontend microservices using Spring Boot & Spring Cloud, ensuring modularity and scalability.
-# - Automated CI/CD pipeline: Implemented Google Cloud Build and Artifact Registry, reducing deployment time by 30% through automated builds and rollouts.
-# - Improved fault tolerance and scaling: Configured Kubernetes Deployments & Services, enabling zero-downtime updates and automatic recovery.
-# - Optimized service discovery & API communication: Integrated Kubernetes Ingress & Service Mesh, reducing API response time by 40%.
-# - Ensured external accessibility: Deployed Cloud Load Balancers, providing a seamless experience with minimal downtime.
-# - Modernized frontend services: Developed and deployed a React.js & Node.js-based frontend for improved performance and scalability.
+Deployed a highly available GKE cluster: Provisioned a 3-node Kubernetes cluster and containerized the monolithic application using Docker.
+Refactored monolith into microservices: Split the application into Orders, Products, and Frontend microservices using Spring Boot & Spring Cloud, ensuring modularity and scalability.
+Automated CI/CD pipeline: Implemented Google Cloud Build and Artifact Registry, reducing deployment time by 30% through automated builds and rollouts.
+Improved fault tolerance and scaling: Configured Kubernetes Deployments & Services, enabling zero-downtime updates and automatic recovery.
+Optimized service discovery & API communication: Integrated Kubernetes Ingress & Service Mesh, reducing API response time by 40%.
+Ensured external accessibility: Deployed Cloud Load Balancers, providing a seamless experience with minimal downtime.
+Modernized frontend services: Developed and deployed a React.js & Node.js-based frontend for improved performance and scalability.
 
 ### **Technologies Used:**
 # - Containerization & Orchestration: Kubernetes (GKE), Docker

@@ -6,11 +6,11 @@
 # dynamic Docker image tagging for streamlined deployments, and Slack and email notifications for efficient communication.  
 
 # Key Achievements:  
-# - SonarQube Integration: Implemented static code quality analysis to ensure adherence to coding standards and identify vulnerabilities.  
-# - Dynamic Docker Image Tagging: Automated tagging of Docker images using build numbers for consistent versioning and simplified rollbacks.  
-# - Slack Integration: Configured Jenkins to send real-time notifications about build and scan statuses to a dedicated Slack channel, 
-# - improving team collaboration.  
-# - Email Notifications: Automated email notifications with build logs and scan reports for comprehensive status updates and traceability.  
+SonarQube Integration: Implemented static code quality analysis to ensure adherence to coding standards and identify vulnerabilities.  
+Dynamic Docker Image Tagging: Automated tagging of Docker images using build numbers for consistent versioning and simplified rollbacks.  
+Slack Integration: Configured Jenkins to send real-time notifications about build and scan statuses to a dedicated Slack channel, 
+improving team collaboration.  
+Email Notifications: Automated email notifications with build logs and scan reports for comprehensive status updates and traceability.  
 
 # Technologies Used:  
 # - CI/CD Tool: Jenkins  

@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stable-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: my-app
+      version: stable
+  template:
+    metadata:
+      labels:
+        app: my-app
+        version: stable
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.19

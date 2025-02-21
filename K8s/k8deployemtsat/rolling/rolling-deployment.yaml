@@ -1,0 +1,38 @@
+# kubectl create deployment <deployment-name> \
+#     --image=<image-name> \
+#     --dry-run=client -o yaml > deployment.yaml
+
+
+# # kubectl patch deployment <deployment-name> \
+# #     --type='json' -p='[{"op": "replace", "path": "/spec/strategy", "value": {"type": "RollingUpdate", "rollingUpdate": {"maxUnavailable": 1, "maxSurge": 1}}}]'
+
+
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rolling-deployment
+spec:
+  replicas: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 2
+      maxSurge: 2
+  selector:
+    matchLabels:
+      app: rolling-app
+  template:
+    metadata:
+      labels:
+        app: rolling-app
+    spec:
+      containers:
+      - name: static
+        image: salmaan21/statiwebapp:latest
+
+
+
+
+

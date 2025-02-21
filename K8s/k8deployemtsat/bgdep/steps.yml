@@ -1,0 +1,13 @@
+kubectl apply -f blue-deployment.yaml
+kubectl apply -f blue-green-service.yaml
+
+Deploy the Green version without changing the Service
+kubectl apply -f green-deployment.yaml
+
+Switch Traffic to Green
+7. Update the Service selector to point to Green
+
+kubectl patch service my-service -p '{"spec":{"selector":{"app":"my-app","environment":"green"}}}'
+
+kubectl port-forward svc/my-service 8080:80
+curl http://localhost:8080

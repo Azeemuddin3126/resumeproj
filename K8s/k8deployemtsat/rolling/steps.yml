@@ -1,0 +1,35 @@
+kind create cluster --name dev-cluster
+kubectl cluster-info
+kubectl get nodes
+kubectl apply -f rolling-deployment.yaml
+kubectl port-forward service/my-app 8081:80
+
+
+Update --image
+kubectl set image deployment/<deployment-name> <container-name>=<new-image>
+kubectl set image deployment/portfolio portfolio=nginx:1.23.4
+
+kubectl port-forward deployment/rolling-deployment 8282:80 &
+kubectl rollout status deployment/rolling-deployment
+
+
+kubectl rollout status deployment/<deployment-name>
+
+
+RollBack
+kubectl rollout undo deployment/<deployment-name>
+
+Cleanup
+kubectl delete deployment <deployment-name>
+kubectl delete service <deployment-name>
+
+
+Edit rolling-deployment.yaml the --image
+kubectl apply -f rolling-deployment.yaml
+kubectl rollout status deployment rolling-deployment
+
+
+kubectl scale deployment/myapp-canary --replicas=5
+kubectl scale deployment/myapp-stable --replicas=10
+kubectl rollout undo deployment/myapp-canary
+kubectl rollout undo deployment/myapp-stable

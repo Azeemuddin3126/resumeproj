@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-canary
+  labels:
+    app: myapp
+    version: canary
+spec:
+  replicas: 2  # Initial number of canary pods
+  selector:
+    matchLabels:
+      app: myapp
+      version: canary
+  template:
+    metadata:
+      labels:
+        app: myapp
+        version: canary
+    spec:
+      containers:
+      - name: myapp
+        image: myapp:canary  # Canary version of your app
+        ports:
+        - containerPort: 80
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1  # Maximum number of pods that can be created above the desired replica count
+      maxUnavailable: 1  # Maximum number of pods that can be unavailable during the update
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-stable
+  labels:
+    app: myapp
+    version: stable
+spec:
+  replicas: 4  # Number of stable pods
+  selector:
+    matchLabels:
+      app: myapp
+      version: stable
+  template:
+    metadata:
+      labels:
+        app: myapp
+        version: stable
+    spec:
+      containers:
+      - name: myapp
+        image: myapp:stable  # Stable version of your app
+        ports:
+        - containerPort: 80
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 2  # Allows 2 extra pods during the update
+      maxUnavailable: 2  # Allows 2 pods to be unavailable during the update
+
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-service
+spec:
+  selector:
+    app: myapp
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: LoadBalancer

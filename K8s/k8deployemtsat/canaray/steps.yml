@@ -1,0 +1,17 @@
+kubectl apply -f stable-deployment.yaml
+kubectl apply -f canary-deployment.yaml
+kubectl apply -f canary-service.yaml
+
+
+kubectl scale deployment canary-deployment --replicas=2
+kubectl scale deployment stable-deployment --replicas=2
+
+kubectl apply -k github.com/argoproj/argo-rollouts/manifests/install?ref=v0.16.0
+kubectl argo rollouts get rollout myapp-canary
+kubectl apply -f canary-rollout.yaml
+
+kubectl argo rollouts get rollout myapp-canary
+kubectl argo rollouts undo myapp-canary
+
+kubectl argo rollouts set-weight myapp-canary 100
+

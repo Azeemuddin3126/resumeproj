@@ -1,0 +1,118 @@
+stages:
+  - clean
+  - checkout
+  - static_analysis
+  - test
+  - security_scan
+  - sonar_analysis
+  - docker_build
+  - image_scan
+  - cleanup
+
+variables:
+  GITHUB_REPO: "https://github.com/Azeemuddin3126/Django-sample-web.git"
+  BRANCH: "main"
+  IMAGE: "python:3.9-slim"
+  DOCKER_IMAGE_BASE: "salmaan21/django-sample-web"
+  SONARQUBE_URL: "http://localhost:9000"
+  SLACK_CHANNEL: "#devopsworkupdates"
+  DOCKER_REGISTRY: "docker.io"
+  DOCKER_USERNAME: "your-dockerhub-username"
+  DOCKER_PASSWORD: "your-dockerhub-password"
+
+before_script:
+  - apt-get update && apt-get install -y git curl docker.io
+  - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD" $DOCKER_REGISTRY
+
+clean_workspace:
+  stage: clean
+  script:
+    - echo "Cleaning workspace..."
+    - rm -rf *
+
+git_checkout:
+  stage: checkout
+  script:
+    - echo "Cloning the repository..."
+    - git clone -b $BRANCH $GITHUB_REPO .
+    
+static_code_analysis:
+  stage: static_analysis
+  script:
+    - echo "Running static code analysis with Flake8..."
+    - docker run --rm -v $(pwd):/apps alpine/flake8 /apps > flake8-report.txt || echo "Done testing, please check the file"
+
+unit_tests:
+  stage: test
+  script:
+    - echo "Running unit tests..."
+    - docker run --rm python:3.9-alpine sh -c "pip install pytest && pytest --maxfail=5 --disable-warnings --verbose > result.txt || tail -n 10 result.txt"
+
+owasp_scan:
+  stage: security_scan
+  script:
+    - echo "Running OWASP Dependency Check..."
+    - dependency-check.sh --scan . --format XML --out dependency-check-report.xml
+
+trivy_fs_scan:
+  stage: security_scan
+  script:
+    - echo "Running Trivy FS Scan..."
+    - docker run --rm aquasec/trivy fs . > trivy-fs-report.txt
+
+sonarqube_analysis:
+  stage: sonar_analysis
+  script:
+    - echo "Running SonarQube Analysis..."
+    - sonar-scanner -Dsonar.sources=. -Dsonar.projectName=SampleApp -Dsonar.projectKey=SampleApp -Dsonar.host.url=$SONARQUBE_URL
+
+docker_build_push:
+  stage: docker_build
+  script:
+    - echo "Building Docker image..."
+    - export DOCKER_IMAGE_TAG="$DOCKER_IMAGE_BASE:$CI_PIPELINE_ID"
+    - docker build -t $DOCKER_IMAGE_TAG .
+    - docker tag $DOCKER_IMAGE_TAG $DOCKER_IMAGE_BASE:latest
+    - docker push $DOCKER_IMAGE_TAG
+    - docker push $DOCKER_IMAGE_BASE:latest
+
+trivy_image_scan:
+  stage: image_scan
+  script:
+    - echo "Running Trivy Image Scan..."
+    - docker run --rm aquasec/trivy image $DOCKER_IMAGE_TAG --scanners vuln > trivy-image-report.txt
+
+cleanup:
+  stage: cleanup
+  script:
+    - echo "Cleaning up Docker system..."
+    - docker system prune -a --force
+
+after_script:
+  - echo "Build and scans completed successfully."
+
+artifacts:
+  paths:
+    - flake8-report.txt
+    - result.txt
+    - dependency-check-report.xml
+    - trivy-fs-report.txt
+    - trivy-image-report.txt
+  expire_in: 7 days
+
+
+
+
+send_email_notification:
+  stage: cleanup
+  image: alpine
+  before_script:
+    - apk add --no-cache msmtp msmtp-mta mailx
+  script:
+    - echo "Sending email with reports..."
+    - uuencode flake8-report.txt flake8-report.txt > report.uu
+    - uuencode result.txt result.txt >> report.uu
+    - uuencode dependency-check-report.xml dependency-check-report.xml >> report.uu
+    - uuencode trivy-fs-report.txt trivy-fs-report.txt >> report.uu
+    - uuencode trivy-image-report.txt trivy-image-report.txt >> report.uu
+    - mail -s "GitLab CI/CD Build Report - $CI_PROJECT_NAME" -a report.uu salmaan2631@gmail.com < /dev/null

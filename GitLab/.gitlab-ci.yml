@@ -64,7 +64,10 @@ sonarqube_analysis:
   stage: sonar_analysis
   script:
     - echo "Running SonarQube Analysis..."
-    - sonar-scanner -Dsonar.sources=. -Dsonar.projectName=SampleApp -Dsonar.projectKey=SampleApp -Dsonar.host.url=$SONARQUBE_URL
+    - sonar-scanner -Dsonar.sources=. /
+                    -Dsonar.projectName=SampleApp /
+                    -Dsonar.projectKey=SampleApp  /
+                    -Dsonar.host.url=$SONARQUBE_URL /
 
 docker_build_push:
   stage: docker_build
@@ -75,6 +78,7 @@ docker_build_push:
     - docker tag $DOCKER_IMAGE_TAG $DOCKER_IMAGE_BASE:latest
     - docker push $DOCKER_IMAGE_TAG
     - docker push $DOCKER_IMAGE_BASE:latest
+
 
 trivy_image_scan:
   stage: image_scan
@@ -99,8 +103,6 @@ artifacts:
     - trivy-fs-report.txt
     - trivy-image-report.txt
   expire_in: 7 days
-
-
 
 
 send_email_notification:

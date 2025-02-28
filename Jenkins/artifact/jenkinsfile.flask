@@ -31,11 +31,11 @@ pipeline {
                         -w ${DJANGO_APP_DIR} \
                         ${DJANGO_IMAGE} \
                         sh -c "
-                            python3 -m venv venv && \
-                            source venv/bin/activate && \
-                            pip install -r requirements.txt && \
-                            tar -czvf django-app-with-venv-${BUILD_NUMBER}.tar.gz . && \
-                            ls -l django-app-with-venv-${BUILD_NUMBER}.tar.gz"
+                           - python3 -m venv venv && \
+                           - source venv/bin/activate && \
+                           - pip install -r requirements.txt && \
+                           - tar -czvf django-app-with-venv-${BUILD_NUMBER}.tar.gz . && \
+                           - ls -l django-app-with-venv-${BUILD_NUMBER}.tar.gz"
                 """
             }
         }

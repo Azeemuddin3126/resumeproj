@@ -1,0 +1,309 @@
+# Namespace Example
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev-namespace
+---
+
+# Pod Example
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sample-pod
+  namespace: dev-namespace
+spec:
+  containers:
+  - name: nginx-container
+    image: nginx
+---
+
+# Deployment Example
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample-deployment
+  namespace: dev-namespace
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+---
+
+# Service Example
+apiVersion: v1
+kind: Service
+metadata:
+  name: sample-service
+  namespace: dev-namespace
+spec:
+  selector:
+    app: myapp
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP
+---
+
+# ConfigMap Example
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sample-config
+  namespace: dev-namespace
+data:
+  config-key: "config-value"
+---
+
+# Secret Example
+apiVersion: v1
+kind: Secret
+metadata:
+  name: sample-secret
+  namespace: dev-namespace
+data:
+  password: cGFzc3dvcmQ=
+---
+
+# ReplicaSet Example
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: sample-replicaset
+  namespace: dev-namespace
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+---
+
+# StatefulSet Example
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: sample-statefulset
+  namespace: dev-namespace
+spec:
+  selector:
+    matchLabels:
+      app: stateful-app
+  serviceName: "stateful-service"
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: stateful-app
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+---
+
+# Persistent Volume Example
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: sample-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /data/sample-pv
+---
+
+# Persistent Volume Claim Example
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sample-pvc
+  namespace: dev-namespace
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi
+---
+
+# Job Example
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sample-job
+  namespace: dev-namespace
+spec:
+  template:
+    spec:
+      containers:
+      - name: busybox
+        image: busybox
+        command: ["echo", "Hello Kubernetes"]
+      restartPolicy: Never
+---
+
+# CronJob Example
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: sample-cronjob
+  namespace: dev-namespace
+spec:
+  schedule: "*/5 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: busybox
+            image: busybox
+            command: ["echo", "Hello from CronJob"]
+          restartPolicy: Never
+---
+
+# DaemonSet Example
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: sample-daemonset
+  namespace: dev-namespace
+spec:
+  selector:
+    matchLabels:
+      app: daemon-app
+  template:
+    metadata:
+      labels:
+        app: daemon-app
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+---
+
+# Liveness and Readiness Probe Example
+apiVersion: v1
+kind: Pod
+metadata:
+  name: probe-pod
+  namespace: dev-namespace
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    livenessProbe:
+      httpGet:
+        path: /
+        port: 80
+      initialDelaySeconds: 3
+      periodSeconds: 5
+    readinessProbe:
+      httpGet:
+        path: /
+        port: 80
+      initialDelaySeconds: 3
+      periodSeconds: 5
+---
+
+# Horizontal Pod Autoscaler (HPA) Example
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: sample-hpa
+  namespace: dev-namespace
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: sample-deployment
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 80
+---
+
+# Role-Based Access Control (RBAC) Example
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sample-sa
+  namespace: dev-namespace
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: dev-namespace
+  name: pod-reader
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "watch", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pod-reader-binding
+  namespace: dev-namespace
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: pod-reader
+subjects:
+- kind: ServiceAccount
+  name: sample-sa
+  namespace: dev-namespace
+---
+
+# Ingress Example
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sample-ingress
+  namespace: dev-namespace
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+  rules:
+  - host: sample-app.local
+    http:
+      paths:
+      - path: /sample
+        pathType: Prefix
+        backend:
+          service:
+            name: sample-service
+            port:
+              number: 80
+---
+
+# SideCar Container Example
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sidecar-pod
+  namespace: dev-namespace
+spec:
+  containers:
+  - name: main-app
+    image: nginx
+  - name: sidecar-logger
+    image: busybox
+    command: ["sh", "-c", "while true; do echo $(date) >> /var/log/sidecar.log; sleep 5; done"]
